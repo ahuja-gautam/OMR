@@ -1,15 +1,5 @@
-
-# coding: utf-8
-
-# In[76]:
-
-
 from pyzbar.pyzbar import decode
 from PIL import Image
-
-
-# In[77]:
-
 
 def get_QR_data(image_path):
     """
@@ -22,10 +12,6 @@ def get_QR_data(image_path):
     data=decode(image)
     data_string=str(data[0][0], 'utf-8')
     return data_string.split(":")
-
-
-# In[78]:
-
 
 ## path in the form of r"C:\Users\Gautam\Desktop\OMR\IMAGES\20190627151101_orig.png" (example)
 
