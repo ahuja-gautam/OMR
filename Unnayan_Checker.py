@@ -50,17 +50,6 @@ def prepare_answer_key(num_q):
 # In[3]:
 
 
-ANSWER_KEY=prepare_answer_key(30)
-
-
-# In[4]:
-
-
-print(ANSWER_KEY)
-
-
-# In[5]:
-
 
 import glob
 images = [cv2.cvtColor(cv2.imread(file), cv2.COLOR_BGR2RGB) for file in glob.glob(r'C:\Users\Gautam\Desktop\OMR\IMAGES\*png')]
