@@ -39,7 +39,6 @@ def create_sheet(num_q, state_id, state_name):
     sheet[hor_offset:hor_offset+x,vert_offset:vert_offset+y,]=QR
     cv2.imwrite(present_dir+"\%dencoding.png"%d, sheet)
     copy=cv2.imread(present_dir+"\%dencoding.png"%d)
-    plt.imshow(copy)
     base=1050
     thickness=3
     size=1.5
