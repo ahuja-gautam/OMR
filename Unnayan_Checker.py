@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[33]:
+# In[86]:
 
 
 from imutils import contours
@@ -19,7 +19,7 @@ import os
 import math
 
 
-# In[34]:
+# In[87]:
 
 
 present_dir=os.getcwd()
@@ -29,20 +29,20 @@ save_dir=present_dir+'\RESULTS'
 print(save_dir)
 
 
-# In[35]:
+# In[88]:
 
 
 import glob
 images = [cv2.cvtColor(cv2.imread(file), cv2.COLOR_BGR2RGB) for file in glob.glob(image_dir+r'\*png')]
 
 
-# In[36]:
+# In[89]:
 
 
 len(images)
 
 
-# In[37]:
+# In[90]:
 
 
 def prepare_answer_key(num_q):
@@ -56,7 +56,7 @@ def prepare_answer_key(num_q):
     return ANSWER_KEY
 
 
-# In[38]:
+# In[91]:
 
 
 def remove_shadows(gray_scale):
@@ -75,7 +75,7 @@ def remove_shadows(gray_scale):
     return cv2.merge(result_norm_planes)
 
 
-# In[39]:
+# In[248]:
 
 
 def get_answers(questionCnts, thresh, ANSWER_KEY,paper):
@@ -109,19 +109,18 @@ def get_answers(questionCnts, thresh, ANSWER_KEY,paper):
         k = ANSWER_KEY[q]
 
         if bubbled and k == bubbled[1]:
-            color = (0, 255, 0)
-            
-            ans_array.append(k)       
+            color = (0, 255, 0)            
+            ans_array.append(chr(k+ord('0')))       
         elif not bubbled:
             ans_array.append("NA")
         elif bubbled and k!=bubbled[1]:
-            ans_array.append(bubbled[1])  
+            ans_array.append(chr(bubbled[1]+ord('0')))  
 
         cv2.drawContours(paper, [cnts[k]], -1, color, 3)
     return ans_array
 
 
-# In[40]:
+# In[249]:
 
 
 def get_master(TopBox, thresh):   
@@ -143,7 +142,7 @@ def get_master(TopBox, thresh):
     
 
 
-# In[41]:
+# In[250]:
 
 
 def get_roll_number(ROLL_NO, thresh):
@@ -182,7 +181,7 @@ def get_roll_number(ROLL_NO, thresh):
     return roll, X_encounter
 
 
-# In[42]:
+# In[251]:
 
 
 def find_questions(thresh, paper):
@@ -202,7 +201,7 @@ def find_questions(thresh, paper):
     return questionCnts
 
 
-# In[43]:
+# In[252]:
 
 
 ##below function for precision
@@ -224,7 +223,7 @@ def find_questions_precise(thresh, paper):
     return questionCnts
 
 
-# In[44]:
+# In[253]:
 
 
 def shuffle_answers(answer, num_q):
@@ -245,7 +244,7 @@ def shuffle_answers(answer, num_q):
         
 
 
-# In[45]:
+# In[254]:
 
 
 def find_edges(edged):
@@ -277,7 +276,7 @@ def find_edges(edged):
     return docCnt
 
 
-# In[46]:
+# In[255]:
 
 
 def get_details(master):
@@ -288,16 +287,18 @@ def get_details(master):
     test_id=['X', 'X']
     
     step=13
+    ##initial index is the bubble index from which it starts
+    ##end index = initial + step*9 +1
+    ##example initial =0 final= 0+117+1
     for offset in range(0,5):
         flag=False
         for i in range(0+offset, 118+offset, step):
-            print(i, master[i])
             if(master[i]==1 and flag==True):
                 school_id[offset]='X'
                 break
             if(master[i]==1):
                 flag=True
-                school_id[offset]=math.floor((i-offset)/step)
+                school_id[offset]=chr(math.floor((i-offset)/step) +ord('0'))
     
     for offset in range(0,2):
         flag=False
@@ -307,7 +308,7 @@ def get_details(master):
                 break
             if(master[i]==1):
                 flag=True
-                class_id[offset]=math.floor((i-5-offset)/step)
+                class_id[offset]=chr(math.floor((i-5-offset)/step)+ord('0'))
     
     for offset in range(0,2):
         flag=False
@@ -317,7 +318,7 @@ def get_details(master):
                 break
             if(master[i]==1):
                 flag=True
-                section_id[offset]=math.floor((i-7-offset)/step)
+                section_id[offset]=chr(math.floor((i-7-offset)/step)+ord('0'))
                 
     for offset in range(0,2):
         flag=False
@@ -327,7 +328,7 @@ def get_details(master):
                 break
             if(master[i]==1):
                 flag=True
-                roll_no[offset]=math.floor((i-9-offset)/step)
+                roll_no[offset]=chr(math.floor((i-9-offset)/step) +ord('0'))
                 
     for offset in range(0,2):
         flag=False
@@ -337,12 +338,12 @@ def get_details(master):
                 break
             if(master[i]==1):
                 flag=True
-                test_id[offset]=math.floor((i-11-offset)/step)
+                test_id[offset]=chr(math.floor((i-11-offset)/step) +ord('0'))
                 
     return school_id, roll_no, test_id, class_id, section_id
 
 
-# In[47]:
+# In[256]:
 
 
 def checkX(school_id, class_id, section_id, roll_no, test_id):
@@ -364,7 +365,7 @@ def checkX(school_id, class_id, section_id, roll_no, test_id):
     return False
 
 
-# In[48]:
+# In[296]:
 
 
 def evaluate_image_batch(images, num_q):
@@ -376,9 +377,10 @@ def evaluate_image_batch(images, num_q):
     TEST_id=[]
     Status=[]
     Answers=[]
-    d=-1
+    d=0
     for image in images:
         d+=1
+        print(d, "out of", len(images))
         X_encountered=False
         ## images have to be rotated 90 degrees first
         
@@ -394,7 +396,7 @@ def evaluate_image_batch(images, num_q):
         docCnt=find_edges(edged)
         paper = four_point_transform(image, docCnt.reshape(4, 2))
         warped = four_point_transform(gray, docCnt.reshape(4, 2))
-        print(warped.shape[0]/warped.shape[1], d)
+        ## print(warped.shape[0]/warped.shape[1],d)
         ratio=(warped.shape[0]/warped.shape[1])
         paper=cv2.resize(paper, (430,600))
         warped=cv2.resize(paper, (430,600))
@@ -411,8 +413,7 @@ def evaluate_image_batch(images, num_q):
         
         
         
-        
-        if(ratio>=1.44 or len(questionCnts)!=(130+(4*num_q))):
+        if(ratio>=1.47 or len(questionCnts)!=(130+(4*num_q))):
             SCHOOL_id.append("Flagged")
             CLASS_id.append("Flagged")
             SECTION_id.append("Flagged")
@@ -469,8 +470,7 @@ def evaluate_image_batch(images, num_q):
             
             
         
-        school_id, roll_no, test_id, class_id, section_id=get_details(Master)
-        print(school_id, roll_no, test_id, class_id, section_id)    
+        school_id, roll_no, test_id, class_id, section_id=get_details(Master)   
         '''
         except:
             print(d, "****")
@@ -508,10 +508,30 @@ def evaluate_image_batch(images, num_q):
     return SCHOOL_id, CLASS_id, SECTION_id, ROLL_no, TEST_id, Status, Answers
 
 
-# In[49]:
+# In[297]:
 
 
 SCHOOL, CLASS, SECTION, ROLL, TEST_ID, Status, ANSWERS=evaluate_image_batch(images, 50)
+
+
+# In[280]:
+
+
+'''
+def convert_list_to_string(arr):
+    if(type(arr)==list):
+        temp=""
+        for x in arr:
+            temp+=x
+        return temp
+    return arr
+'''
+
+
+# In[281]:
+
+
+
 
 
 # 
@@ -536,25 +556,38 @@ SCHOOL, CLASS, SECTION, ROLL, TEST_ID, Status, ANSWERS=evaluate_image_batch(imag
 #         warped=resize(warped)
 #         paper=resize(paper)
 
-# In[50]:
+# In[282]:
 
 
 mapping=list(zip(SCHOOL, CLASS, SECTION, ROLL, TEST_ID, Status, ANSWERS))
 
 
-# In[51]:
+# In[283]:
 
 
 import pandas as pd
 df=pd.DataFrame(mapping, columns=['SCHOOL_id','CLASS_id', 'SECTION_id','ROLL', 'TEST_id', 'Status','ANSWERS'])
-df.head(n=10)
+df.head(n=5)
 
 
-# In[52]:
+# In[284]:
+
+
+
+
+
+# In[285]:
 
 
 df.to_csv("Results.csv")
 
 
-# In[ ]:
+# In[298]:
+
+
+### DEBGUGGING BELOW
+
+
+# In[266]:
+
 
