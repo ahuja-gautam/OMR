@@ -26,7 +26,7 @@ present_dir=os.getcwd()
 
 def create_sheet(num_q, state_id, state_name):
     d=state_id
-    sheet=cv2.imread('Sheet%d.jpg'%num_q)
+    sheet=cv2.imread('Sheet%d.png'%num_q)
     encoding=(str(num_q)+":"+str(state_id)+":"+str(state_name)).upper()
     qr_code=pyqrcode.create(content=encoding, error='L',version=3)
     qr_code.png(present_dir+"\%dencoding.png"%d, scale=15)
