@@ -1,0 +1,11 @@
+fpdf==1.7.2
+img2pdf==0.4.4
+imutils==0.5.4
+matplotlib==3.6.0
+numpy==1.23.3
+ocr==0.1.0
+pandas==1.4.4
+Pillow==9.2.0
+pypng==0.20220715.0
+pyqrcode==1.2.1
+pyzbar==0.1.9

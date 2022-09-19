@@ -1,4 +1,8 @@
 # OMR
+This application performs Optical Mark recognition on a top-down images using computer vision.
+
+### Example
+![Results of OMR](/RESULTS/15result.jpg)
 
 Problem 1: Currently the app checks present frame, and if page is detected, it captures the next frame which can lead to page not being detected. 
 
